@@ -19,6 +19,9 @@ __pycache__/
 *.env
 *.pem
 
+!*.env.dist
+!env.example
+
 # === Project Secrets / Local Settings ===
 alembic.ini
 
@@ -77,3 +80,6 @@ data/
 sessions/
 bot_sessions/
 state.json
+
+# == architecture tree ==
+tree.txt

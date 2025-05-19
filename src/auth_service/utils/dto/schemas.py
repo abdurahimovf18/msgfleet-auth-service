@@ -1,11 +1,17 @@
 from typing import Annotated, Any
 from uuid import UUID
+from datetime import datetime
 import re
 
 from pydantic import Field
 from pydantic_core import core_schema
 
 from src.auth_service.domain.models import enums
+from enum import Enum
+
+
+class STREnum(str, Enum):
+    pass
 
 
 class PasswordStr:
@@ -80,9 +86,23 @@ class UsernameStr:
         return value
 
 
+class Languages(STREnum):
+    EN = "EN"
+    RU = "RU"
+    UZ = "UZ"
+
+
+class User:
+    id = Annotated[UUID, Field()]
+    language = Annotated[Languages, Field()]
+
+    created_at = Annotated[datetime, Field()]
+    updated_at = Annotated[datetime, Field()]
+
+
 class Auth:
     id = Annotated[UUID, Field()]
-    user_id = Annotated[UUID, Field()]
+    user_id = User.id
 
     username = UsernameStr
     password = PasswordStr

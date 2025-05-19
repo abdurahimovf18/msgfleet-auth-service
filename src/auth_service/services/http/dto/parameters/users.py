@@ -1,5 +1,6 @@
-from src.auth_service.utils.dto import BaseDTO
+from src.auth_service.utils.dto import BaseDTO, s
 
 
 class CreateDTO(BaseDTO):
-    language: str
+    language: s.User.language
+    

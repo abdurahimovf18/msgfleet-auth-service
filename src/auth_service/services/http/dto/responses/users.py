@@ -1,11 +1,8 @@
-from uuid import UUID
-from datetime import datetime
-
-from src.auth_service.utils.dto import BaseDTO
+from src.auth_service.utils.dto import BaseDTO, s
 
 
 class CreateDTO(BaseDTO):
-    id: UUID
-    language: str
-    created_at: datetime
-    updated_at: datetime
+    id: s.User.id
+    language: s.User.language
+    created_at: s.User.created_at
+    updated_at: s.User.updated_at

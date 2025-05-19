@@ -16,6 +16,7 @@ class Auth(Base):
     __tablename__ = "auth"
     
     id: Mapped[id_]
+    user_id: Mapped[id_]
 
     username: Mapped[str]
     password: Mapped[str]

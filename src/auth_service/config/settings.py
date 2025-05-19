@@ -1,53 +1,112 @@
-from datetime import timezone, timedelta
 from pathlib import Path
+from datetime import timezone, timedelta
+from typing import Optional
 import sys
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, HttpUrl
+from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
-DEBUG = True
-
-TIMEZONE: timezone = timezone.utc
+# ---------------------------------------------
+# Base directory for locating env files and logs
+# ---------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
+SECRETS_DIR = BASE_DIR / "secrets"
+APP_SECRETS_DIR = SECRETS_DIR / "app"
+
+# ---------------------------------------------
+# Static settings / constants
+# ---------------------------------------------
+
+DEBUG: bool = True
+TIMEZONE = timezone.utc
+
+# ---------------------------------------------
+# Environment: Core Application & Database
+# ---------------------------------------------
 
 class Env(BaseSettings):
-    # ---------------------------------------------
-    # Postgresql
-    # ---------------------------------------------
-
+    # PostgreSQL configuration
     POSTGRESQL_USER: str
     POSTGRESQL_PASSWORD: str
     POSTGRESQL_HOST: str
     POSTGRESQL_PORT: int
     POSTGRESQL_DATABASE: str
 
-    # ---------------------------------------------
-    # Jwt authentication
-    # ---------------------------------------------
-
+    # JWT authentication
     JWT_ALGORITHM: str
-    JWT_TOKEN: str
     JWT_ISS: str
+    JWT_EXP: int
 
     model_config = SettingsConfigDict(
-        env_file=BASE_DIR / ".env"
+        env_file=APP_SECRETS_DIR / ".env",
     )
 
 
-env = Env()
+# ---------------------------------------------
+# Environment: Microservice URLs
+# ---------------------------------------------
 
+class ServiceUrlsEnv(BaseSettings):
+    # Optional service base URLs
+    USERS_SERVICE_URL: Optional[HttpUrl] = Field(default=None)
+    AUTH_SERVICE_URL: Optional[HttpUrl] = Field(default=None)
+
+    model_config = SettingsConfigDict(
+        env_file=APP_SECRETS_DIR / ".service-urls.env",
+    )
+
+
+# ---------------------------------------------
+# Environment Instances
+# ---------------------------------------------
+
+env = Env()
+service_urls = ServiceUrlsEnv()
+
+
+# ---------------------------------------------
+# Database URLs (build elsewhere if needed)
+# ---------------------------------------------
 
 ASYNC_DATABASE_URL = f"postgresql+asyncpg://{env.POSTGRESQL_USER}:{env.POSTGRESQL_PASSWORD}@{env.POSTGRESQL_HOST}:{env.POSTGRESQL_PORT}/{env.POSTGRESQL_DATABASE}"
 SYNC_DATABASE_URL = f"postgresql+psycopg2://{env.POSTGRESQL_USER}:{env.POSTGRESQL_PASSWORD}@{env.POSTGRESQL_HOST}:{env.POSTGRESQL_PORT}/{env.POSTGRESQL_DATABASE}"
 
 
-# ------------------------
-# Logging Configuration
-# ------------------------
+# ---------------------------------------------
+# JWT Settings
+# ---------------------------------------------
 
-# Logging settings for development/debug mode
+PRIVATE_KEY_FILE = APP_SECRETS_DIR / "private_key.pem"
+
+try:
+    with PRIVATE_KEY_FILE.open("r") as f:
+        JWT_PRIVATE_KEY = f.read()
+except FileNotFoundError:
+    raise RuntimeError(
+        f"{PRIVATE_KEY_FILE} not found.\n"
+        "This file contains the JWT private key used for token verification.\n"
+        "Please ensure it exists and is accessible at runtime."
+    )
+
+JWT_ALGORITHM = env.JWT_ALGORITHM
+JWT_ISS = env.JWT_ISS
+JWT_EXP = env.JWT_EXP
+
+# ---------------------------------------------
+# Microservice URLs (optional values)
+# ---------------------------------------------
+
+USERS_SERVICE_URL = service_urls.USERS_SERVICE_URL
+AUTH_SERVICE_URL = service_urls.AUTH_SERVICE_URL
+
+
+# ---------------------------------------------
+# Logging Configuration
+# ---------------------------------------------
+
 LOG_DEBUG_SETTINGS = [
     {
         "sink": sys.stdout,
@@ -60,13 +119,12 @@ LOG_DEBUG_SETTINGS = [
         "sink": BASE_DIR / "logs/debug.log",
         "level": "INFO",
         "format": "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
-        "rotation": "7 days",   # Create a new log file every 7 days
-        "retention": "1 month", # Keep logs for one month before deletion
-        "compression": "zip",   # Compress logs after rotation
+        "rotation": "7 days",
+        "retention": "1 month",
+        "compression": "zip",
     }
 ]
 
-# Logging settings for production mode
 LOG_PRODUCTION_SETTINGS = [
     {
         "sink": BASE_DIR / "logs/app.log",
@@ -78,18 +136,3 @@ LOG_PRODUCTION_SETTINGS = [
         "enqueue": True
     }
 ]
-
-
-JWT_TOKEN = env.JWT_TOKEN
-JWT_ALGORITHM = env.JWT_ALGORITHM
-JWT_EXP = timedelta(minutes=15)
-JWT_ISS = env.JWT_ISS
-
-
-# ------------------------
-# service urls
-# ------------------------
-
-USERS_SERVICE_URL = "http://localhost/users"
-
-
