@@ -3,6 +3,8 @@ This repository holds code of the part of the micro-service based application: "
 ## 📌 Responsibilities
 This service is responsible for authorizing and registering users and keeping user auth
 logic safe and clean. The main authorization fields are username and password.
+   - has own shared package which requires public .pem file and provides ability for
+     other services to unpack jwt token data without http calls.
 
 ## ⚙️ Tech-Stacks
 
