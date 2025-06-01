@@ -17,7 +17,8 @@ from jwt import encode
 from time import perf_counter
 
 from src.auth_service.utils.dto import BaseDTO, s
-from src.auth_service.config.settings import JWT_ALGORITHM, JWT_EXP, JWT_ISS, JWT_PRIVATE_KEY, TIMEZONE
+from auth_service.config.app import JWT_ALGORITHM, JWT_EXP, JWT_ISS, JWT_PRIVATE_KEY
+from auth_service.config.base import TIMEZONE
 
 
 ph = PasswordHasher(

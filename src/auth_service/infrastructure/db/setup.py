@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import MetaData
 
-from src.auth_service.config.settings import ASYNC_DATABASE_URL
+from auth_service.config.db import ASYNC_DATABASE_URL
 
 
 engine = create_async_engine(

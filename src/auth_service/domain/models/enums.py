@@ -1,10 +1,6 @@
 from enum import Enum
 
 
-class STREnum(str, Enum): pass
-
-
-class UserRole(STREnum):
+class UserRole(Enum):
     ADMIN = "ADMIN"
     USER = "USER"
-    

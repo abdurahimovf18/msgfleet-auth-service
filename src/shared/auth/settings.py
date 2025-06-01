@@ -1,9 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
-from src.auth_service.config.settings import SECRETS_DIR
+from auth_service.config.base import BASE_DIR
 
 
-AUTH_SECRETS_DIR = SECRETS_DIR / "auth"
+AUTH_SECRETS_DIR = BASE_DIR / "secrets" / "auth"
 PUBLIC_KEY_FILE = AUTH_SECRETS_DIR / "public_key.pem"
 
 

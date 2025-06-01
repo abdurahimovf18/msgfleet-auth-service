@@ -1,2 +1,0 @@
-from .queries import auth
-

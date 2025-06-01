@@ -4,7 +4,7 @@ from uuid import uuid4, UUID
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import UUID as SQLUUID
 
-from src.auth_service.config.settings import TIMEZONE
+from auth_service.config.base import TIMEZONE
 from src.auth_service.infrastructure.db.setup import Base
 from src.auth_service.domain.models import enums
 

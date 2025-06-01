@@ -6,7 +6,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from src.auth_service.config.settings import SYNC_DATABASE_URL
+from auth_service.config.base import SYNC_DATABASE_URL
 from src.auth_service.infrastructure.db.models import Base
 
 
